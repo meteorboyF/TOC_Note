@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TOC Notes — CSE 2233</title>
+<meta name="description" content="Interactive Theory of Computation notes for UIU CSE 2233: basic concepts, DFA design by question type, solved past mid papers with step-by-step visualisers.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header id="top"></header>
+<div class="wrap">
+  <section class="hero">
+    <span class="pill accent">CSE 2233 · Theory of Computation · Mid preparation</span>
+    <h1 style="margin-top:12px">Learn automata by <span>watching them run</span>.</h1>
+    <p class="lead">Notes organised by question type, built from 21 past mid papers (2018–2026), the class notes and the slides. Every past DFA question is solved, explained step by step, and has an interactive visualiser you can feed your own strings.</p>
+    <div class="stat-row" id="stats"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+      <a class="btn primary" href="dfa.html">Start with DFA →</a>
+      <a class="btn" href="concepts.html">Basic concepts</a>
+      <a class="btn" href="papers.html">Browse past papers</a>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Topics</h2>
+    <div class="grid grid-3">
+      <a class="card topic" href="concepts.html"><span class="ico">Σ*</span><h3>Basic Concepts</h3><p>Symbols, alphabets, strings, Σⁿ, languages, the 5-tuple, how a DFA computes, with interactive explorers.</p><span class="pill ok">ready</span></a>
+      <a class="card topic" href="dfa.html"><span class="ico">δ</span><h3>DFA design</h3><p>12 question types, each with a recipe, tricks and every past question solved, plus a step-by-step visualiser.</p><span class="pill ok">ready</span></a>
+      <div class="card topic soon"><span class="ico">N</span><h3>NFA design</h3><p>Q2 of every mid: starts with / contains / ends with, using guessing.</p><span class="pill">coming soon</span></div>
+      <div class="card topic soon"><span class="ico">ε</span><h3>ε-NFA & ε-closure</h3><p>ε-transitions, ε-closure of each state, ε-NFA design.</p><span class="pill">coming soon</span></div>
+      <div class="card topic soon"><span class="ico">⇒</span><h3>NFA / ε-NFA → DFA</h3><p>Subset construction with tables (Q4, 4–6 marks).</p><span class="pill">coming soon</span></div>
+      <div class="card topic soon"><span class="ico">🌳</span><h3>NFA tree & δ̂</h3><p>Show acceptance with an NFA tree (Q3, 3 marks).</p><span class="pill">coming soon</span></div>
+      <div class="card topic soon"><span class="ico">( )*</span><h3>Regular expressions</h3><p>Writing REs for languages, RE ↔ automata (Q5).</p><span class="pill">coming soon</span></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>What the mid looks like</h2>
+    <p class="muted">How often each topic appeared across the 21 papers. Since 2022 the layout has been fixed: Q1 DFA (9), Q2 NFA (9), Q3 NFA tree (3), Q4 conversion to DFA (6), Q5 regular expressions (3).</p>
+    <div class="card pad"><table class="t" id="freq"><thead><tr><th>Topic</th><th>Papers</th><th style="width:45%"></th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section class="section">
+    <h2>How to use these notes</h2>
+    <div class="grid grid-3">
+      <div class="card pad"><h3>1 · Learn the type</h3><p class="muted" style="margin:0">Each DFA type starts with “how to recognise it”, a recipe and the traps. Read these first: they are what you reproduce in the exam.</p></div>
+      <div class="card pad"><h3>2 · Try it yourself</h3><p class="muted" style="margin:0">Before opening a solution, draw your own DFA on paper. Then test strings in the visualiser and compare state by state.</p></div>
+      <div class="card pad"><h3>3 · Quiz</h3><p class="muted" style="margin:0">Use <b>🎯 Quiz me</b> under any DFA to guess whether random strings are accepted. It builds the habit of tracing quickly.</p></div>
+    </div>
+  </section>
+</div>
+<footer id="foot"></footer>
+<script src="assets/js/common.js"></script>
+<script src="assets/data/papers.js"></script>
+<script src="assets/data/dfa-data.js"></script>
+<script>
+(function () {
+  const past = DFA_DATA.filter(q => /\d{4}/.test(q.src)).length;
+  document.getElementById('stats').innerHTML = [
+    [PAPERS.length, 'past papers analysed'],
+    [past, 'past DFA questions solved'],
+    [DFA_TYPES.length, 'DFA question types'],
+    [DFA_DATA.length, 'interactive DFAs'],
+  ].map(([n, t]) => `<div class="card stat"><b>${n}</b><span>${t}</span></div>`).join('');
+
+  const counts = {};
+  for (const p of PAPERS) for (const t of new Set(p.qs.map(q => q[1]))) counts[t] = (counts[t] || 0) + 1;
+  document.querySelector('#freq tbody').innerHTML = Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([t, n]) =>
+    `<tr><td>${TOPIC_NAMES[t]}</td><td>${n} / ${PAPERS.length}</td><td><div class="bar"><i style="width:${(100 * n / PAPERS.length).toFixed(0)}%"></i></div></td></tr>`).join('');
+})();
+</script>
+</body>
+</html>

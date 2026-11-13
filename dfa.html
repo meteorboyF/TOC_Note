@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DFA — TOC Notes</title>
+<meta name="description" content="Deterministic Finite Automata: every past UIU CSE 2233 mid DFA question, grouped by type, with interactive step-by-step visualisers.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header id="top"></header>
+
+<div class="wrap">
+  <div class="layout">
+    <aside class="sidebar">
+      <h4>On this page</h4>
+      <a href="#how"><span class="num">★</span><span>How to attack any DFA question</span></a>
+      <div id="side-types"></div>
+      <h4 style="margin-top:16px">Tools</h4>
+      <input type="text" id="q-search" placeholder="filter: “bac”, “2024”…" style="width:100%;font-family:var(--sans)">
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="btn" id="open-all" type="button">Expand all</button>
+        <button class="btn" id="close-all" type="button">Collapse</button>
+      </div>
+    </aside>
+
+    <main>
+      <h1>Deterministic Finite Automata</h1>
+      <p class="lead">Q1 of every mid is “Design DFAs that accept the following languages” (9–10 marks). Below, all <b id="dfa-count">…</b> past DFA questions (2018–2026) are grouped into 12 types, following the type-wise approach from the class notes. Each type has a recipe, tricks, a worked example and every past question of that type, with an interactive visualiser.</p>
+
+      <section class="type-section" id="how">
+        <div class="type-head"><span class="tnum">★</span><h2>How to attack any DFA question</h2></div>
+        <div class="type-grid">
+          <div class="callout tip">
+            <div class="callout-title">🧭 The 5-step method</div>
+            <ol>
+              <li><b>Write 3 accepted and 3 rejected strings</b> first — include the shortest accepted one and an overlapping one.</li>
+              <li><b>Find the type</b> (count? length? substring? start/contains/end?). The type tells you the shape.</li>
+              <li><b>Ask “what must I remember?”</b> Each different thing to remember = one state. Name states by meaning (“seen ba”, “odd a’s”).</li>
+              <li><b>Give every state an edge for every symbol.</b> Missing edges → dead state. Use the box method for failed matches.</li>
+              <li><b>Test your strings</b> by walking through the diagram, then write the 5-tuple / transition table if asked.</li>
+            </ol>
+          </div>
+          <div class="callout trap">
+            <div class="callout-title">⚠ Where marks are lost</div>
+            <ul>
+              <li>Missing transitions (a DFA must be <b>complete</b> — one edge per symbol from every state).</li>
+              <li>No start arrow, or accept states not double-circled.</li>
+              <li>Going back to the start on a mismatch when part of the pattern already matches (e.g. 1010 while looking for 1011 → go to “10”, not q0).</li>
+              <li>Ignoring overlaps between “starts with”, “contains” and “ends with”.</li>
+              <li>Wrong ε handling: is the empty string accepted? (Zero is even and divisible by everything.)</li>
+              <li>Reading Σ carelessly — extra symbols (like c, 2, w) still need edges.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout good">
+          <div class="callout-title">▶ Using the visualiser</div>
+          Open any question, type a string (or click a sample chip) and press <b>Run</b> or <b>Step ▶</b>. The current state is highlighted in yellow, the edge just taken lights up, and the matching cell of the transition table is marked. At the end the final state turns green (accepted) or red (rejected). Hover over a row in “What each state means” to find that state in the diagram. Use <b>🎯 Quiz me</b> to practise.
+        </div>
+      </section>
+
+      <div id="types"></div>
+    </main>
+  </div>
+</div>
+
+<footer id="foot"></footer>
+<script src="assets/js/common.js"></script>
+<script src="assets/vendor/viz-global.js"></script>
+<script src="assets/data/dfa-data.js"></script>
+<script src="assets/js/dfa-viz.js"></script>
+<script src="assets/js/dfa-page.js"></script>
+</body>
+</html>

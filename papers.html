@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Past Papers — TOC Notes</title>
+<meta name="description" content="Every UIU CSE 2233 mid-term paper from 2018 to 2026, question by question, tagged by topic and linked to solutions.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header id="top"></header>
+<div class="wrap narrow">
+  <h1>Past mid papers</h1>
+  <p class="lead">All 21 mid-term papers (Summer 2018 → Spring 2026), question by question. Solved questions link straight to their step-by-step solution and visualiser.</p>
+  <div class="filter" id="filter"></div>
+  <div id="papers"></div>
+</div>
+<footer id="foot"></footer>
+<script src="assets/js/common.js"></script>
+<script src="assets/data/papers.js"></script>
+<script src="assets/data/dfa-data.js"></script>
+<script>
+(function () {
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const typeTitle = Object.fromEntries(window.DFA_TYPES.map(t => [t.key, 'Type ' + t.n + ': ' + t.title]));
+  const dfaType = Object.fromEntries(window.DFA_DATA.map(q => [q.id, q.type]));
+  let topic = 'ALL';
+
+  const topics = ['ALL', ...Object.keys(TOPIC_NAMES).filter(t => PAPERS.some(p => p.qs.some(q => q[1] === t)))];
+  const filter = document.getElementById('filter');
+  function drawFilter() {
+    filter.innerHTML = topics.map(t => `<button type="button" class="chip ${t === topic ? 'on' : ''}" data-t="${t}">${t === 'ALL' ? 'All topics' : esc(TOPIC_NAMES[t])}</button>`).join('');
+  }
+  filter.addEventListener('click', e => {
+    const b = e.target.closest('[data-t]');
+    if (!b) return;
+    topic = b.dataset.t; drawFilter(); draw();
+  });
+
+  function draw() {
+    document.getElementById('papers').innerHTML = [...PAPERS].reverse().map(p => {
+      const qs = p.qs.filter(q => topic === 'ALL' || q[1] === topic);
+      if (!qs.length) return '';
+      return `<div class="card paper" id="p${p.code}">
+        <div class="paper-head"><h3>${esc(p.term)}</h3><span class="pill">CSE2233_Mid_${p.code}</span></div>
+        <table class="t"><tbody>${qs.map(([no, t, text, link]) => `<tr>
+          <td class="mono" style="width:70px">${esc(no)}</td>
+          <td style="width:150px"><span class="pill ${t === 'DFA' ? 'accent' : ''}">${esc(TOPIC_NAMES[t])}</span></td>
+          <td>${esc(text)}${link ? ` <br><a href="dfa.html#q-${link}" class="small">→ solution & visualiser · ${esc(typeTitle[dfaType[link]] || '')}</a>` : ' <span class="pill" title="This topic is coming soon">soon</span>'}</td>
+        </tr>`).join('')}</tbody></table>
+      </div>`;
+    }).join('');
+  }
+  drawFilter(); draw();
+})();
+</script>
+</body>
+</html>

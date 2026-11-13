@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Basic Concepts — TOC Notes</title>
+<meta name="description" content="Symbols, alphabets, strings, Σⁿ, Σ*, languages, the DFA 5-tuple and how a DFA computes, with interactive explorers.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header id="top"></header>
+<div class="wrap">
+<div class="layout">
+  <aside class="sidebar">
+    <h4>Basic concepts</h4>
+    <a href="#model"><span class="num">1</span><span>Model of computation</span></a>
+    <a href="#symbols"><span class="num">2</span><span>Symbol, alphabet, string</span></a>
+    <a href="#powers"><span class="num">3</span><span>Σⁿ, Σ*, Σ⁺</span></a>
+    <a href="#languages"><span class="num">4</span><span>Languages & operations</span></a>
+    <a href="#fa"><span class="num">5</span><span>Finite automata</span></a>
+    <a href="#formal"><span class="num">6</span><span>Formal definition (5-tuple)</span></a>
+    <a href="#computation"><span class="num">7</span><span>How a DFA computes (δ̂)</span></a>
+    <a href="#regular"><span class="num">8</span><span>Regular languages</span></a>
+    <a href="#design"><span class="num">9</span><span>Designing a DFA</span></a>
+    <a href="#exam"><span class="num">10</span><span>Writing the answer</span></a>
+  </aside>
+  <main>
+    <h1>Basic Concepts</h1>
+    <p class="lead">Everything you need before designing automata: the vocabulary (Σ, strings, languages), the formal definition of a DFA and how it processes input. Try the small tools on this page as you read.</p>
+
+    <!-- 1 -->
+    <section class="type-section" id="model">
+      <h2>1 · Model of computation</h2>
+      <p>A <b>model of computation</b> is an assumption about how a machine behaves: for certain inputs we get certain outputs. It is an <b>abstract representation of a physical machine</b>. We ignore the hardware and keep only what matters: what the machine can <i>remember</i> and how it reacts to each input.</p>
+      <p>The simplest model is the <b>finite automaton</b>: a machine with a finite amount of memory (its states). Real examples: a light switch (ON/OFF), an automatic door controller, a vending machine, the lexer in a compiler.</p>
+    </section>
+
+    <!-- 2 -->
+    <section class="type-section" id="symbols">
+      <h2>2 · Symbol, alphabet, string</h2>
+      <div class="def"><b>Symbol</b> — the basic building block of a system; any character or token. Examples: <code>a</code>, <code>b</code>, <code>0</code>, <code>1</code>, <code>+</code>, <code>@</code>, <code>int</code>.</div>
+      <div class="def"><b>Alphabet (Σ)</b> — a <b>finite, non-empty set</b> of symbols. Σ<sub>Eng</sub> = {a, b, …, z}, Σ<sub>num</sub> = {0, 1, …, 9}, Σ<sub>bin</sub> = {0, 1}.</div>
+      <div class="def"><b>String (word)</b> — a <b>finite sequence</b> of symbols over an alphabet. Over Σ = {a, b}: <code>abba</code>, <code>b</code>, <code>aaab</code>.</div>
+      <div class="def"><b>Empty string (ε)</b> — the string of length zero. |ε| = 0. Note that ε is a string, not a symbol, and ε ∉ Σ.</div>
+      <div class="two-col">
+        <div>
+          <h3>Useful definitions</h3>
+          <ul>
+            <li><b>Length</b> |w| = number of symbols. |abba| = 4.</li>
+            <li><b>Concatenation</b> xy = x followed by y. If x = ab, y = ba then xy = abba. wε = εw = w.</li>
+            <li><b>Reverse</b> wᴿ: abb → bba. A <b>palindrome</b> satisfies w = wᴿ.</li>
+            <li><b>Prefix</b> of w: any start part (including ε and w). <b>Suffix</b>: any end part.</li>
+            <li><b>Substring</b>: any consecutive part. “bac” is a substring of “abaca”, but “bc” is not.</li>
+          </ul>
+        </div>
+        <div class="callout tip">
+          <div class="callout-title">💡 Why this matters for DFAs</div>
+          “Starts with X” is a <b>prefix</b> condition, “ends with Z” a <b>suffix</b> condition, and “contains Y” a <b>substring</b> condition. Matching a pattern means tracking the <i>longest suffix of what you read that is a prefix of the pattern</i>; that idea solves most DFA questions.
+        </div>
+      </div>
+      <div class="card widget">
+        <div class="widget-title">🔬 String lab</div>
+        <div class="widget-row"><label>w = <input type="text" id="sl-w" value="abaca" style="width:180px"></label></div>
+        <div class="out-box" id="sl-out"></div>
+      </div>
+    </section>
+
+    <!-- 3 -->
+    <section class="type-section" id="powers">
+      <h2>3 · Powers of an alphabet: Σⁿ, Σ*, Σ⁺</h2>
+      <ul>
+        <li><b>Σⁿ</b> = the set of all strings of length exactly n. |Σⁿ| = |Σ|ⁿ.</li>
+        <li><b>Σ⁰ = {ε}</b>: exactly one string of length 0.</li>
+        <li><b>Σ* = Σ⁰ ∪ Σ¹ ∪ Σ² ∪ …</b>: all strings, including ε (Kleene star). Infinite, but every string in it is finite.</li>
+        <li><b>Σ⁺ = Σ¹ ∪ Σ² ∪ …</b> = Σ* − {ε}: all non-empty strings.</li>
+      </ul>
+      <div class="card widget">
+        <div class="widget-title">🧮 Σⁿ explorer</div>
+        <div class="widget-row">
+          <label>Σ = { <input type="text" id="pw-s" value="a, b" style="width:120px"> }</label>
+          <label>n = <input type="number" id="pw-n" value="3" min="0" max="8" style="width:70px"></label>
+        </div>
+        <div class="out-box" id="pw-out"></div>
+        <p class="small muted" style="margin:8px 0 0">Multi-character symbols work too: try Σ = {0, 10, 111} (Summer 2018, Q5(b) asks for Σ²).</p>
+      </div>
+    </section>
+
+    <!-- 4 -->
+    <section class="type-section" id="languages">
+      <h2>4 · Languages & operations</h2>
+      <div class="def"><b>Language</b> — any set of strings over Σ, i.e. any subset L ⊆ Σ*. It can be finite ({ab, ba}), infinite ({w | w has even length}), or empty (∅). Note that ∅ ≠ {ε}.</div>
+      <ul>
+        <li><b>Union</b> L₁ ∪ L₂, <b>intersection</b> L₁ ∩ L₂, <b>complement</b> L̄ = Σ* − L.</li>
+        <li><b>Concatenation</b> L₁L₂ = { xy | x ∈ L₁, y ∈ L₂ }.</li>
+        <li><b>Power</b> L⁰ = {ε}, Lⁿ = L·Lⁿ⁻¹. For example L² = LL. <b>Kleene star</b> L* = L⁰ ∪ L¹ ∪ L² ∪ …</li>
+      </ul>
+      <div class="card widget">
+        <div class="widget-title">🧮 Language power Lⁿ</div>
+        <div class="widget-row">
+          <label>L = { <input type="text" id="lp-l" value="ba, ab, bbb" style="width:170px"> }</label>
+          <label>n = <input type="number" id="lp-n" value="2" min="0" max="4" style="width:70px"></label>
+        </div>
+        <div class="out-box" id="lp-out"></div>
+        <p class="small muted" style="margin:8px 0 0">Fall 2018 Q5(c): “Suppose L = {ba, ab, bbb}. Write down L².” Duplicates collapse because a language is a <b>set</b>.</p>
+      </div>
+    </section>
+
+    <!-- 5 -->
+    <section class="type-section" id="fa">
+      <h2>5 · Finite automata</h2>
+      <p>A finite automaton reads the input <b>one symbol at a time, left to right</b>. It has finitely many <b>states</b>, which are its only memory. After the last symbol, if the machine is in an <b>accept state</b>, the string is <b>accepted</b>; otherwise it is <b>rejected</b>.</p>
+      <div class="two-col">
+        <div class="card pad">
+          <h3>Parts of a state diagram</h3>
+          <ul style="margin:0">
+            <li><b>States</b>: circles (q0, q1, …).</li>
+            <li><b>Start state</b>: the one with an arrow coming from nowhere.</li>
+            <li><b>Accept states</b>: double circles.</li>
+            <li><b>Transitions</b>: arrows labelled with symbols.</li>
+            <li><b>Dead (trap) state</b>: a non-accepting state that loops on every symbol. Once you enter it, the string is rejected.</li>
+          </ul>
+        </div>
+        <div class="card pad">
+          <h3>DFA vs NFA</h3>
+          <table class="t">
+            <tr><th></th><th>DFA</th><th>NFA</th></tr>
+            <tr><td>Edges per symbol</td><td>exactly 1</td><td>0, 1 or many</td></tr>
+            <tr><td>ε-moves</td><td>no</td><td>allowed (ε-NFA)</td></tr>
+            <tr><td>Current state</td><td>one</td><td>a set of states</td></tr>
+            <tr><td>Power</td><td colspan="2">equal: both recognise exactly the regular languages</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 -->
+    <section class="type-section" id="formal">
+      <h2>6 · Formal definition: the 5-tuple</h2>
+      <p>A deterministic finite automaton is a 5-tuple <b>M = (Q, Σ, δ, q₀, F)</b> where</p>
+      <ol>
+        <li><b>Q</b> is a finite set of <b>states</b>,</li>
+        <li><b>Σ</b> is a finite set called the <b>alphabet</b>,</li>
+        <li><b>δ : Q × Σ → Q</b> is the <b>transition function</b> (one next state for each state–symbol pair),</li>
+        <li><b>q₀ ∈ Q</b> is the <b>start state</b>,</li>
+        <li><b>F ⊆ Q</b> is the set of <b>accept states</b>.</li>
+      </ol>
+      <p>Example (Sipser M1): Q = {q1, q2, q3}, Σ = {0, 1}, start q1, F = {q2}. L(M1) = { w | w contains at least one 1 and an even number of 0’s follow the last 1 }. Run it:</p>
+      <div class="card pad">
+        <div id="m1-viz"></div>
+        <div class="qcols"><div><h4 class="small muted" style="text-transform:uppercase;letter-spacing:.07em">What each state means</h4><div id="m1-mean"></div></div><div><h4 class="small muted" style="text-transform:uppercase;letter-spacing:.07em">Transition table</h4><div id="m1-tab"></div></div></div>
+      </div>
+    </section>
+
+    <!-- 7 -->
+    <section class="type-section" id="computation">
+      <h2>7 · How a DFA computes</h2>
+      <p>Let M = (Q, Σ, δ, q₀, F) and w = w₁w₂…wₙ. M <b>accepts</b> w if there is a sequence of states r₀, r₁, …, rₙ such that</p>
+      <ol>
+        <li>r₀ = q₀ (start in the start state),</li>
+        <li>δ(rᵢ, wᵢ₊₁) = rᵢ₊₁ for i = 0, …, n−1 (follow the transitions),</li>
+        <li>rₙ ∈ F (end in an accept state).</li>
+      </ol>
+      <p>The <b>extended transition function</b> δ̂ runs a whole string: δ̂(q, ε) = q and δ̂(q, wa) = δ(δ̂(q, w), a). Then <b>w is accepted ⇔ δ̂(q₀, w) ∈ F</b>. The “δ̂ trace” line under every visualiser is exactly this sequence r₀ → r₁ → … → rₙ.</p>
+      <p><b>L(M)</b>, the language of M, is the set of all strings M accepts. We say M <b>recognises</b> L(M).</p>
+    </section>
+
+    <!-- 8 -->
+    <section class="type-section" id="regular">
+      <h2>8 · Regular languages</h2>
+      <p>A language is <b>regular</b> if some finite automaton recognises it. Every language in the DFA section is regular. Not everything is: {aⁿbⁿ | n ≥ 0} needs unbounded memory to compare the counts, so no DFA exists for it. (Compare it with aⁱbʲ, where i and j are independent: that one <i>is</i> regular.)</p>
+      <p>Slide example (Sipser M5): Σ = {0, 1, 2, R} where R = ⟨RESET⟩. The machine accepts when the <b>sum of the symbols is 0 mod 3</b>, and R resets the sum to 0. Try <code>10R22R012</code>:</p>
+      <div class="card pad"><div id="m5-viz"></div></div>
+    </section>
+
+    <!-- 9 -->
+    <section class="type-section" id="design">
+      <h2>9 · Designing a DFA: “be the automaton”</h2>
+      <p>The key question from the slides: <b>what do I need to remember about the string so far?</b> Each distinct situation becomes a state.</p>
+      <ul>
+        <li><i>Odd number of y’s</i> → remember “even so far” or “odd so far” → 2 states.</li>
+        <li><i>Contains 001</i> → remember how much of 001 has been seen: nothing, “0”, “00”, or all of “001” → 4 states.</li>
+        <li><i>Length divisible by 3</i> → remember length mod 3 → 3 states.</li>
+      </ul>
+      <div class="two-col">
+        <div class="callout tip"><div class="callout-title">Dead state & completeness</div>A DFA must have exactly one transition for every (state, symbol). If a situation can never lead to acceptance (“started with the wrong symbol”), send it to a <b>dead state</b> that loops on every symbol.</div>
+        <div class="callout tip"><div class="callout-title">Complement</div>For “does NOT …” languages, build the DFA for “…” and swap accept and non-accept states. The DFA must be complete first, dead state included.</div>
+        <div class="callout tip"><div class="callout-title">Product (AND / OR)</div>Two conditions → run both DFAs at once: states are pairs (p, q). AND accepts when both parts accept; OR accepts when either part does.</div>
+        <div class="callout tip"><div class="callout-title">Test before you finish</div>Always walk the shortest accepted string, a tricky overlapping string, and ε through your diagram.</div>
+      </div>
+      <p style="margin-top:14px"><a class="btn primary" href="dfa.html">Go to the 12 DFA question types →</a></p>
+    </section>
+
+    <!-- 10 -->
+    <section class="type-section" id="exam">
+      <h2>10 · Writing the answer in the exam</h2>
+      <div class="card pad">
+        <ol style="margin:0">
+          <li><b>Language understanding</b>: write 2–3 accepted and rejected strings (shows the examiner you read it right).</li>
+          <li><b>State diagram</b>: start arrow, double circles for accept states, every state has one edge per symbol, dead state drawn.</li>
+          <li><b>State meanings</b> (optional but valuable): a short note under each state, e.g. “q3: seen ba”.</li>
+          <li><b>If asked for components / 5-tuple</b>: Q = {…}, Σ = {…}, δ as a transition table (mark → start and * accept), q₀, F = {…}.</li>
+        </ol>
+      </div>
+    </section>
+  </main>
+</div>
+</div>
+<footer id="foot"></footer>
+<script src="assets/js/common.js"></script>
+<script src="assets/vendor/viz-global.js"></script>
+<script src="assets/js/dfa-viz.js"></script>
+<script>
+(function () {
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const show = s => (s === '' ? 'ε' : s);
+
+  // String lab
+  const slw = document.getElementById('sl-w'), slo = document.getElementById('sl-out');
+  function stringLab() {
+    const w = slw.value.trim();
+    const pre = [], suf = [], sub = new Set();
+    for (let i = 0; i <= w.length; i++) { pre.push(w.slice(0, i)); suf.push(w.slice(i)); }
+    for (let i = 0; i <= w.length; i++) for (let j = i; j <= w.length; j++) sub.add(w.slice(i, j));
+    const rev = [...w].reverse().join('');
+    slo.innerHTML = `|w| = ${w.length}<br>wᴿ = ${esc(show(rev))} ${w === rev ? '<span class="pill ok">palindrome</span>' : ''}<br>` +
+      `prefixes (${pre.length}): ${pre.map(x => esc(show(x))).join(', ')}<br>` +
+      `suffixes (${suf.length}): ${suf.map(x => esc(show(x))).join(', ')}<br>` +
+      `distinct substrings (${sub.size}): ${[...sub].sort((a, b) => a.length - b.length || a.localeCompare(b)).map(x => esc(show(x))).join(', ')}`;
+  }
+  slw.addEventListener('input', stringLab); stringLab();
+
+  // Σⁿ explorer
+  const pws = document.getElementById('pw-s'), pwn = document.getElementById('pw-n'), pwo = document.getElementById('pw-out');
+  const parseSet = v => [...new Set(v.split(',').map(x => x.trim()).filter(x => x.length))];
+  function power(set, n) {
+    let cur = [''];
+    for (let i = 0; i < n; i++) { const nx = []; for (const x of cur) for (const s of set) nx.push(x + s); cur = nx; if (cur.length > 5000) break; }
+    return cur;
+  }
+  function powers() {
+    const s = parseSet(pws.value), n = Math.max(0, Math.min(8, +pwn.value || 0));
+    if (!s.length) { pwo.textContent = 'An alphabet must be non-empty.'; return; }
+    const res = power(s, n);
+    const total = Math.pow(s.length, n);
+    pwo.innerHTML = `|Σ| = ${s.length}, so |Σ<sup>${n}</sup>| = ${s.length}<sup>${n}</sup> = ${total}<br>Σ<sup>${n}</sup> = { ${res.slice(0, 300).map(x => esc(show(x))).join(', ')}${total > 300 ? ', …' : ''} }`;
+  }
+  pws.addEventListener('input', powers); pwn.addEventListener('input', powers); powers();
+
+  // Lⁿ
+  const lpl = document.getElementById('lp-l'), lpn = document.getElementById('lp-n'), lpo = document.getElementById('lp-out');
+  function lpow() {
+    const L = parseSet(lpl.value).map(x => (x === 'ε' ? '' : x)), n = Math.max(0, Math.min(4, +lpn.value || 0));
+    const res = [...new Set(power(L, n))].sort((a, b) => a.length - b.length || a.localeCompare(b));
+    lpo.innerHTML = `L<sup>${n}</sup> = { ${res.map(x => esc(show(x))).join(', ')} } &nbsp;<span class="muted">(${res.length} strings)</span>`;
+  }
+  lpl.addEventListener('input', lpow); lpn.addEventListener('input', lpow); lpow();
+
+  // Sipser M1
+  const M1 = {
+    id: 'm1', sigma: ['0', '1'], symLabels: {},
+    states: [
+      { name: 'q1', accept: false, dead: false, label: 'no 1 seen yet' },
+      { name: 'q2', accept: true, dead: false, label: 'last 1 is followed by an even number of 0’s' },
+      { name: 'q3', accept: false, dead: false, label: 'last 1 is followed by an odd number of 0’s' },
+    ],
+    delta: [{ 0: 0, 1: 1 }, { 0: 2, 1: 1 }, { 0: 1, 1: 1 }],
+    given: { acc: ['1', '01', '11', '0101010101', '100', '0100', '110000'], rej: ['', '0', '10', '101000'] },
+    samples: { acc: [], rej: [] },
+  };
+  DFAViz.mount(document.getElementById('m1-viz'), M1, { meaningEl: document.getElementById('m1-mean'), tableEl: document.getElementById('m1-tab') });
+
+  // Sipser M5 (sum mod 3 with RESET)
+  const M5 = {
+    id: 'm5', sigma: ['0', '1', '2', 'R'], symLabels: { R: 'R' },
+    states: [
+      { name: 'q0', accept: true, dead: false, label: 'sum ≡ 0 (mod 3)' },
+      { name: 'q1', accept: false, dead: false, label: 'sum ≡ 1 (mod 3)' },
+      { name: 'q2', accept: false, dead: false, label: 'sum ≡ 2 (mod 3)' },
+    ],
+    delta: [{ 0: 0, 1: 1, 2: 2, R: 0 }, { 0: 1, 1: 2, 2: 0, R: 0 }, { 0: 2, 1: 0, 2: 1, R: 0 }],
+    given: { acc: ['10R22R012', '12', '111', 'R'], rej: ['1', '22', '10R2'] },
+    samples: { acc: [], rej: [] },
+  };
+  DFAViz.mount(document.getElementById('m5-viz'), M5, {});
+})();
+</script>
+</body>
+</html>
