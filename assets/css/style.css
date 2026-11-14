@@ -219,6 +219,10 @@ details.q > summary .meta { display: flex; gap: 6px; flex-wrap: wrap; margin-bot
 .dfa-svg g.edge.used path { stroke: color-mix(in srgb, var(--cur-stroke) 55%, var(--muted)); stroke-width: 1.8; }
 .dfa-svg g.edge.start path, .dfa-svg g.edge.start polygon { stroke: var(--fg); fill: var(--fg); }
 .dfa-svg g.node { cursor: default; }
+/* accept states: Graphviz draws an inner and an outer ring; only the inner one may be filled,
+   otherwise the outer fill hides the inner ring and the double circle looks single */
+.dfa-svg g.node ellipse:nth-of-type(2) { fill: none !important; }
+.dfa-svg g.node.accept ellipse { stroke-width: 1.6; }
 
 /* tables in the visualiser */
 table.tt { border-collapse: collapse; font-family: var(--mono); font-size: .88rem; }
